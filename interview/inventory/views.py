@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.views import APIView
-
+from django.utils.dateparse import parse_date
 from interview.inventory.models import Inventory, InventoryLanguage, InventoryTag, InventoryType
 from interview.inventory.schemas import InventoryMetaData
 from interview.inventory.serializers import InventoryLanguageSerializer, InventorySerializer, InventoryTagSerializer, InventoryTypeSerializer
@@ -27,8 +27,20 @@ class InventoryListCreateView(APIView):
         return Response(serializer.data, status=201)
     
     def get(self, request: Request, *args, **kwargs) -> Response:
-        serializer = self.serializer_class(self.get_queryset(), many=True)
-        
+        date_after = request.query_params.get('date_after')
+        if date_after:
+            try:
+                date_after = parse_date(date_after)  # date format example 2024-05-22
+                if not date_after:
+                    raise ValueError
+            except ValueError:
+                return Response({'error': 'Invalid date format'}, status=400)
+
+            queryset = self.get_queryset().filter(created_at__gte=date_after)
+        else:
+            queryset = self.get_queryset()
+
+        serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data, status=200)
     
     def get_queryset(self):
