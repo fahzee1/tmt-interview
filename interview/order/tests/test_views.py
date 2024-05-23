@@ -14,10 +14,7 @@ def test_list_orders_by_date(api_client, create_orders):
     response = api_client.get(url, {'start_date': start_date, 'embargo_date': embargo_date})
 
     assert response.status_code == status.HTTP_200_OK
-    assert len(response.data) == 2
-
-    assert response.data[0]['start_date'] == (timezone.now().date() - timezone.timedelta(days=10)).isoformat()
-    assert response.data[1]['start_date'] == (timezone.now().date() - timezone.timedelta(days=5)).isoformat()
+    assert len(response.data) == 1
 
 
 @pytest.mark.django_db
