@@ -1,5 +1,5 @@
 from django.db import models
-
+from decimal import Decimal
 from interview.core.behaviors import IsActiveModel, NameModel, TimestampedModel, UniqueNameModel
 
 
@@ -46,7 +46,14 @@ class Inventory(NameModel, TimestampedModel, models.Model):
 
     def __str__(self) -> str:
         return self.name
-    
+
+    def save(self, *args, **kwargs):
+        # Make sure all Decimal fields in metadata are converted to float
+        if isinstance(self.metadata, dict):
+            for key, value in self.metadata.items():
+                if isinstance(value, Decimal):
+                    self.metadata[key] = float(value)
+        super().save(*args, **kwargs)
     @classmethod
     def get_by_type(cls, type_id: int):
         return cls.objects.filter(type_id=type_id)

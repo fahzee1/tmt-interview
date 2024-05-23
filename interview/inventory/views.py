@@ -29,14 +29,11 @@ class InventoryListCreateView(APIView):
     def get(self, request: Request, *args, **kwargs) -> Response:
         date_after = request.query_params.get('date_after')
         if date_after:
-            try:
-                date_after = parse_date(date_after)  # date format example 2024-05-22
-                if not date_after:
-                    raise ValueError
-            except ValueError:
-                return Response({'error': 'Invalid date format'}, status=400)
-
-            queryset = self.get_queryset().filter(created_at__gte=date_after)
+            parsed_date = parse_date(date_after)
+            if parsed_date:
+                queryset = self.get_queryset().filter(created_at__gte=parsed_date)
+            else:
+                return Response({'error': 'Invalid date format. Use YYYY-MM-DD.'}, status=400)
         else:
             queryset = self.get_queryset()
 
