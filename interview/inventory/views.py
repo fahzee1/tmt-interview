@@ -1,7 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.views import APIView
-
 from interview.inventory.models import Inventory, InventoryLanguage, InventoryTag, InventoryType
 from interview.inventory.schemas import InventoryMetaData
 from interview.inventory.serializers import InventoryLanguageSerializer, InventorySerializer, InventoryTagSerializer, InventoryTypeSerializer
@@ -28,7 +27,6 @@ class InventoryListCreateView(APIView):
     
     def get(self, request: Request, *args, **kwargs) -> Response:
         serializer = self.serializer_class(self.get_queryset(), many=True)
-        
         return Response(serializer.data, status=200)
     
     def get_queryset(self):
